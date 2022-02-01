@@ -10,6 +10,8 @@ if(!require(tidygraph))install.packages(tidygraph)
 if(!require(tidyverse))install.packages(tidyverse)
 if(!require(googledrive))install.packages(googledrive)
 if(!require(readxl))install.packages(readxl)
+if(!require(igraph))install.packages(igraph)
+if(!require(ggraph))install.packages(ggraph)
 ```
 
 ## TFT champions and traits
@@ -30,7 +32,22 @@ colnames(edges) <- c("Trait", "Champion", "Type")
 edges <- select(edges,!Type)
 ```
 ```{r network, include=False}
-igraph::graph(edges = edges,)
+g <- graph_from_data_frame(edges, vertices = nodes) %>%
+  set_vertex_attr("Cost", value = nodes$Cost) %>%
+  as_tbl_graph()
+
+V(g)$Type[V(g)$Type != "Champion"]
+
+V(g)$color <- recode(V(g)$Type,"Champion" = "gray50","linking-phrase" = "tomato")
+
+g %>%
+  #morph(to_subgraph,V(g) == "BIS315A")%>%
+  ggraph(layout = 'kk') + 
+  geom_edge_fan() +
+  geom_node_point(aes(size = cost, color = color),show.legend = FALSE
+    )
+
+edge.attributes(g)
 ```
 
 ## Including Plots
