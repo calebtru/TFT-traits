@@ -1,0 +1,44 @@
+---
+title: "Team Fight Tactics Traits"
+author: "Caleb Trujillo"
+date: "2/1/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+if(!require(tidygraph))install.packages(tidygraph)
+if(!require(tidyverse))install.packages(tidyverse)
+if(!require(googledrive))install.packages(googledrive)
+if(!require(readxl))install.packages(readxl)
+```
+
+## TFT champions and traits
+
+The figure below displays champions and the relationships they have to various traits. Classes and origins are indicated.
+
+```{r load data, include=False}
+drive_download("https://docs.google.com/spreadsheets/d/1YcpAryA_AXxMxHq8DNIb6QjkoJjmBE-LxYlegOzpR94/edit#gid=1653168612", overwrite = TRUE)
+nodes <- read_excel("TFT traits.xlsx", 
+    sheet = "nodes", col_names = FALSE, col_types = c("text", 
+        "text", "numeric"))
+colnames(nodes) <- c("Node", "Type", "Cost")
+
+edges <- read_excel("TFT traits.xlsx", 
+    sheet = "Champion traits 6.5", col_names = FALSE, col_types = c("text", 
+        "text", "text"))
+colnames(edges) <- c("Trait", "Champion", "Type")
+edges <- select(edges,!Type)
+```
+```{r network, include=False}
+igraph::graph(edges = edges,)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
