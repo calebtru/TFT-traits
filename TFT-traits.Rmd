@@ -12,6 +12,7 @@ if(!require(googledrive))install.packages(googledrive)
 if(!require(readxl))install.packages(readxl)
 if(!require(igraph))install.packages(igraph)
 if(!require(ggraph))install.packages(ggraph)
+if(!require("RColorBrewer"))install.packages("RColorBrewer")
 ```
 
 ## TFT champions and traits
@@ -33,21 +34,23 @@ edges <- select(edges,!Type)
 ```
 ```{r network, include=False}
 g <- graph_from_data_frame(edges, vertices = nodes) %>%
-  set_vertex_attr("Cost", value = nodes$Cost) %>%
+  #set_vertex_attr("Cost", value = nodes$Cost) %>%
   as_tbl_graph()
 
-V(g)$Type[V(g)$Type != "Champion"]
+V(g)$shape <- recode(V(g)$Type, Champion = "Square", Origin = "Hex", Class = "Circle")
 
-V(g)$color <- recode(V(g)$Type,"Champion" = "gray50","linking-phrase" = "tomato")
+traits <- V(g)[V(g)$Type != "Champion"]
+V(g)$color[V(g)$Type != "Champion"] <- rainbow(length(traits))
+
+edge.start <- ends(g, es=E(g), names=F)[,1]
+edge.col <- V(g)$color[edge.start]
 
 g %>%
-  #morph(to_subgraph,V(g) == "BIS315A")%>%
   ggraph(layout = 'kk') + 
   geom_edge_fan() +
-  geom_node_point(aes(size = cost, color = color),show.legend = FALSE
-    )
+  geom_node_point(aes(size = Cost, color = color, shape = shape),show.legend = FALSE) +
+  geom_node_label(aes(label = name), repel = TRUE)
 
-edge.attributes(g)
 ```
 
 ## Including Plots
