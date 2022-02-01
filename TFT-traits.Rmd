@@ -13,6 +13,7 @@ if(!require(readxl))install.packages(readxl)
 if(!require(igraph))install.packages(igraph)
 if(!require(ggraph))install.packages(ggraph)
 if(!require("RColorBrewer"))install.packages("RColorBrewer")
+if(!require("ggiraph"))install.packages("ggiraph")
 ```
 
 ## TFT champions and traits
@@ -45,20 +46,35 @@ V(g)$color[V(g)$Type != "Champion"] <- rainbow(length(traits))
 edge.start <- ends(g, es=E(g), names=F)[,1]
 edge.col <- V(g)$color[edge.start]
 
-g %>%
+graph <- g %>%
   ggraph(layout = 'kk') + 
-  geom_edge_fan() +
-  geom_node_point(aes(size = Cost, color = color, shape = shape),show.legend = FALSE) +
-  geom_node_label(aes(label = name), repel = TRUE)
+  geom_edge_fan(aes(color = edge.col)) +
+  geom_node_point(aes(size = Cost, color = V(g)$color, shape = shape),show.legend = FALSE) +
+  #geom_node_text(aes(label = name,size = degree(greys)),
+              #   family = "serif",repel = TRUE)+
+ geom_node_label(aes(label = name, fill = V(g)$color), repel = TRUE) +
+  theme_graph() +
+  theme(legend.position = "none")
 
+graph
+
+ggraph(g, layout = "manual", x = x, y = y) + 
+	 geom_edge_link0(edge_colour = "#A8A8A8",
+    edge_width = 0.8, edge_alpha = 1, arrow = arrow(angle = 30, length = unit(0.15,
+        "inches"), ends = "last", type = "closed")) + 
+	 geom_node_point(aes(fill = color),
+    colour = "#000000", size = 4, shape = 21, stroke = 0.3) + 
+	 scale_fill_brewer(palette = "Set3",
+    na.value = "gray53") + 
+	 geom_node_text(aes(label = name), colour = "#000000",
+    size = 2.5, family = "Helvetica", repel = TRUE, segment.alpha = 0) + 
+    theme_graph() + 
+	 theme(legend.position = "none")```
+
+Adding interactivity 
+
+```{r graph, echo=FALSE}
+
+girafe(ggobj = graph,width_svg = 5, height_svg = 5,
+       options = list(opts_sizing(rescale = FALSE)))
 ```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
