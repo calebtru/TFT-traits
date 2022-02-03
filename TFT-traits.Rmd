@@ -69,7 +69,8 @@ ggraph(g, layout = "manual", x = x, y = y) +
 	 geom_node_text(aes(label = name), colour = "#000000",
     size = 2.5, family = "Helvetica", repel = TRUE, segment.alpha = 0) + 
     theme_graph() + 
-	 theme(legend.position = "none")```
+	 theme(legend.position = "none")
+```
 
 Adding interactivity 
 
